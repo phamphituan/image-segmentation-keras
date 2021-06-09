@@ -77,10 +77,12 @@ def train(model,
           val_steps_per_epoch=512,
           gen_use_multiprocessing=False,
           ignore_zero_class=False,
-          optimizer_name='adam',
           do_augment=False,
           augmentation_name="aug_all",
           callbacks=None,
+          metrics = ['accuracy'],
+          optimizer = 'adam',
+          loss_func = 'categorical_crossentropy',
           custom_augmentation=None,
           other_inputs_paths=None,
           preprocessing=None,
@@ -109,16 +111,15 @@ def train(model,
         assert val_images is not None
         assert val_annotations is not None
 
-    if optimizer_name is not None:
 
-        if ignore_zero_class:
-            loss_k = masked_categorical_crossentropy
-        else:
-            loss_k = 'categorical_crossentropy'
+    if ignore_zero_class:
+        loss_k = masked_categorical_crossentropy
+    else:
+        loss_k = loss_func
 
-        model.compile(loss=loss_k,
-                      optimizer=optimizer_name,
-                      metrics=['accuracy'])
+    model.compile(loss=loss_k,
+                  optimizer=optimizer,
+                  metrics=metrics)
 
     if checkpoints_path is not None:
         config_file = checkpoints_path + "_config.json"
